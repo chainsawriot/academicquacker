@@ -1,0 +1,67 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# academicquacker
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+If it collects tweets like a duck, binds tweets like a duck, and quacks like a duck, then it probably _is_ an academic.
+
+The goal of this (experimental) package is to convert raw data collected by [academictwitteR](https://github.com/cjbarrie/academictwitteR) into [DuckDB](https://github.com/duckdb/duckdb) in a memory efficient manner. This package also serves as a test bed for rolling out experimental features of `bind_tweets` in `academictwitteR`.
+
+Why DuckDB? Because it quacks... I mean, [it rocks](https://duckdb.org/docs/why_duckdb)!
+
+Why isn't the last R capitalized? Because the developer always forgets which "r" in the word "academicquacker" to capitalize.
+
+## Installation
+
+You can install the development version of academicquacker with:
+
+``` r
+remotes::install_github("chainsawriot/academicquacker")
+```
+
+## Example
+
+Suppose `dir` is a directory hosting json files collected with academictwitteR.
+
+```{r, include = FALSE}
+dir <- "~/dev/einfach/tests/testdata/ica21"
+```
+
+```{r example1}
+library(academicquacker)
+con <- quack(dir, db = "mydata.duckdb", db_close = TRUE)
+```
+
+It won't fill up all main memory in your computer.
+
+## Analysis
+
+Now you can do analysis with the database. For example, you can use dplyr like you usually do with dataframes.
+
+```{r example2}
+library(DBI)
+library(dplyr)
+con <- dbConnect(duckdb::duckdb(), dbdir = "mydata.duckdb")
+
+tbl(con, "tweets") %>% count(user_username, sort = TRUE)
+```
+
+```{r, include = FALSE}
+DBI::dbDisconnect(con, shutdown = TRUE)
+unlink("mydata.duckdb")
+```

@@ -1,0 +1,20 @@
+Package: academicquacker
+Title: Convert Twitter Data To DuckDB And Other Formats
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Chung-hong",
+           family = "Chan",
+           role = c("aut", "cre"),
+           email = "chainsawtiney@gmail.com",
+           comment = c(ORCID = "0000-0002-6232-7530"))
+Description: A drop-in replacement for academictwitteR::bind_tweets which converts twitter data collected with academictwitteR into DuckDB.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1.9001
+Imports: 
+    academictwitteR,
+    duckdb,
+    DBI,
+    purrr
