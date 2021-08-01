@@ -78,3 +78,52 @@ tbl(con, "tweets") %>% count(user_username, sort = TRUE)
 #> 10 monrodriguez     113
 #> # … with more rows
 ```
+
+Most retweeted original content that is not from @icahdq
+
+``` r
+tbl(con, "tweets") %>% arrange(desc(retweet_count)) %>% filter(is.na(sourcetweet_id) & user_username != "icahdq") %>% select(user_username, text, retweet_count)
+#> # Source:     lazy query [?? x 3]
+#> # Database:   duckdb_connection
+#> # Ordered by: desc(retweet_count)
+#>    user_username text                                              retweet_count
+#>    <chr>         <chr>                                                     <int>
+#>  1 claesdevreese "🚨HASHTAG HELP🚨\n\nTake part of the #ica21 con…            50
+#>  2 shannimcg     "In the year of our Lord 2021, there is a sessio…            34
+#>  3 LSawyerED     "Hey #ica21! Is everyone ready for a bigggggg th…            33
+#>  4 akaka15       "My article Suing the #Algorithm is finally out.…            32
+#>  5 poli_com      "Our division's flagship journal, Political Comm…            29
+#>  6 katypearce    "More senior #ICA21 folks -- please try to leave…            27
+#>  7 tdienlin      "In their systematic review of digital skills, @…            23
+#>  8 Andreas_Hepp  "At #ica21 we have a panel \"Beyond Californian …            22
+#>  9 claesdevreese "IT'S A WRAP. My @icahdq Presidential term is ov…            20
+#> 10 olivermb      "Hi all @icahdq friends!! I'm so excited to anno…            20
+#> # … with more rows
+```
+
+Calculate average retweets per original tweet by user who wrote at least
+three tweets
+
+``` r
+tbl(con, "tweets") %>% filter(is.na(sourcetweet_id)) %>% group_by(user_username) %>% summarise(avg_rt = sum(retweet_count, na.rm = TRUE) / n(), n = n()) %>% filter(n > 2) %>% arrange(desc(avg_rt))
+#> # Source:     lazy query [?? x 3]
+#> # Database:   duckdb_connection
+#> # Ordered by: desc(avg_rt)
+#>    user_username avg_rt     n
+#>    <chr>          <dbl> <dbl>
+#>  1 icahdq            12    85
+#>  2 tamigraph          6     4
+#>  3 Luk_O              6     4
+#>  4 ProfKevinCoe       5     5
+#>  5 SummerDHarlow      5     3
+#>  6 CAP_Ltd            5     4
+#>  7 olivermb           4    10
+#>  8 MiriamSiemon       4     3
+#>  9 lara_schreurs      4     4
+#> 10 DaystarUni         4    31
+#> # … with more rows
+```
+
+You can find more information about this in the [“Introduction to
+dbplyr”](https://dbplyr.tidyverse.org/articles/dbplyr.html) Vignette
+of tidyverse

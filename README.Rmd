@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # academicquacker
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/chainsawriot/academicquacker/workflows/R-CMD-check/badge.svg)](https://github.com/chainsawriot/academicquacker/actions)
 <!-- badges: end -->
 
 If it collects tweets like a duck, binds tweets like a duck, and quacks like a duck, then it probably _is_ an academic.
@@ -39,7 +40,7 @@ remotes::install_github("chainsawriot/academicquacker")
 Suppose `dir` is a directory hosting json files collected with academictwitteR.
 
 ```{r, include = FALSE}
-dir <- "~/dev/einfach/tests/testdata/ica21"
+dir <- "tests/testdata/ica21"
 ```
 
 ```{r example1}
@@ -60,6 +61,20 @@ con <- dbConnect(duckdb::duckdb(), dbdir = "mydata.duckdb")
 
 tbl(con, "tweets") %>% count(user_username, sort = TRUE)
 ```
+
+Most retweeted original content that is not from @icahdq
+
+```{r example3}
+tbl(con, "tweets") %>% arrange(desc(retweet_count)) %>% filter(is.na(sourcetweet_id) & user_username != "icahdq") %>% select(user_username, text, retweet_count)
+```
+
+Calculate average retweets per original tweet by user who wrote at least three tweets
+
+```{r example4}
+tbl(con, "tweets") %>% filter(is.na(sourcetweet_id)) %>% group_by(user_username) %>% summarise(avg_rt = sum(retweet_count, na.rm = TRUE) / n(), n = n()) %>% filter(n > 2) %>% arrange(desc(avg_rt))
+```
+
+You can find more information about this in the ["Introduction to dbplyr"](https://dbplyr.tidyverse.org/articles/dbplyr.html) Vignette of tidyverse
 
 ```{r, include = FALSE}
 DBI::dbDisconnect(con, shutdown = TRUE)

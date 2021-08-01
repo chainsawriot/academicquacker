@@ -42,7 +42,7 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRU
     ## con@driver@read_only
     ## "duckdb_connection" %in% class(con)
     rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", "schema.sql", package = "academicquacker")))
-    purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, academictwitteR::convert_json(.)), append = TRUE))
+    purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, convert_json(.)), append = TRUE))
     if (db_close) {
         DBI::dbDisconnect(con, shutdown = TRUE)
         return(db)
