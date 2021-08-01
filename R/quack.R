@@ -19,6 +19,13 @@
 ## library(DBI)
 ## library(duckdb)
 
+#' Convert data collected with academictwitteR into DuckDB
+#'
+#' This function coverts data collected with academictwitteR into DuckDB.
+#' @param data_path path to the directory hosting data collected with academictwitteR
+#' @param db path to the DuckDB; the default value ":memory:" converts the data into a DuckDB in main memory
+#' @param db_close whether to close the DuckDB after the operation. It is better to set it to TRUE, if `db` is not ":memory:"
+#' @param return_con whether or not to return the connnection object
 #' @export
 quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRUE) {
     files <- .ls_files(data_path, "^data_.+\\.json")
