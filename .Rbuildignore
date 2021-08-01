@@ -1,4 +1,6 @@
 ^LICENSE\.md$
 ^README\.Rmd$
+^README\.html$
 ^tests/testdata
+^tests/testthat/test-basic\.R$
 ^\.github$
