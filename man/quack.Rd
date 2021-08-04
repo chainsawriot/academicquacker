@@ -4,7 +4,13 @@
 \alias{quack}
 \title{Convert data collected with academictwitteR into DuckDB}
 \usage{
-quack(data_path, db = ":memory:", db_close = FALSE, return_con = TRUE)
+quack(
+  data_path,
+  db = ":memory:",
+  db_close = FALSE,
+  return_con = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{data_path}{path to the directory hosting data collected with academictwitteR}
@@ -13,7 +19,9 @@ quack(data_path, db = ":memory:", db_close = FALSE, return_con = TRUE)
 
 \item{db_close}{whether to close the DuckDB after the operation. It is better to set it to TRUE, if \code{db} is not ":memory:"}
 
-\item{return_con}{whether or not to return the connnection object}
+\item{return_con}{whether or not to return the connnection object; if false, the argument db is returned invisibly.}
+
+\item{verbose}{whether to display a progress bar}
 }
 \description{
 This function coverts data collected with academictwitteR into DuckDB.

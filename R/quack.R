@@ -25,9 +25,10 @@
 #' @param data_path path to the directory hosting data collected with academictwitteR
 #' @param db path to the DuckDB; the default value ":memory:" converts the data into a DuckDB in main memory
 #' @param db_close whether to close the DuckDB after the operation. It is better to set it to TRUE, if `db` is not ":memory:"
-#' @param return_con whether or not to return the connnection object
+#' @param return_con whether or not to return the connnection object; if false, the argument db is returned invisibly.
+#' @param verbose whether to display a progress bar
 #' @export
-quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRUE) {
+quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRUE, verbose = TRUE) {
     files <- .ls_files(data_path, "^data_.+\\.json")
     empty_str <- structure(list(tweet_id = character(0), user_username = character(0),
                                 text = character(0), possibly_sensitive = logical(0), lang = character(0),
@@ -49,13 +50,27 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRU
     ## con@driver@read_only
     ## "duckdb_connection" %in% class(con)
     rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", "schema.sql", package = "academicquacker")))
-    purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, convert_json(.)), append = TRUE))
+    .insert(files = files, con = con, empty_str = empty_str, verbose = verbose)
     if (db_close) {
         DBI::dbDisconnect(con, shutdown = TRUE)
-        return(db)
+        invisible(db)
     }
     if (return_con) {
         return(con)
     }
-    return(db)
+    invisible(db)
+}
+
+.insert <- function(files, con, empty_str, verbose = TRUE) {
+    if (verbose) {
+        cli::cli_progress_bar("Converting data", total = length(files))
+            for (file in files) {
+                DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, convert_json(file)), append = TRUE)
+                cli::cli_progress_update()
+            }
+        cli::cli_progress_done()
+    } else {
+        purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, convert_json(.)), append = TRUE))
+    }
+    invisible(files)
 }
