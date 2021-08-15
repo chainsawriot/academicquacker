@@ -8,11 +8,11 @@ test_that("most basic op.", {
 
 ## flags
 
-## test_that("verbose", {
-##     skip_on_cran()
-##     dir <- "../testdata/ica21"
-##     expect_snapshot(quack(dir, db = "mydata.duckdb", db_close = TRUE, verbose = TRUE))
-##     unlink("mydata.duckdb")
-##     expect_snapshot(quack(dir, db = "mydata.duckdb", db_close = TRUE, verbose = FALSE))
-##     unlink("mydata.duckdb")
-## })
+test_that("verbose", {
+    skip_on_cran()
+    dir <- "../testdata/ica21"
+    ## expect_output(quack(dir, db = "mydata.duckdb", db_close = TRUE, verbose = TRUE))
+    ## unlink("mydata.duckdb")
+    expect_silent(quack(dir, db = "mydata.duckdb", db_close = TRUE, verbose = FALSE))
+    unlink("mydata.duckdb")
+})
