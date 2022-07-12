@@ -46,19 +46,30 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = F
                                 sourcetweet_text = character(0), sourcetweet_lang = character(0), 
                                 sourcetweet_author_id = character(0)), row.names = integer(0), class = c("tbl_df", 
                                                                                                          "tbl", "data.frame"))
+    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
+    if ("tweets" %in% DBI::dbListTables(con)) {
+        db_exists <- TRUE
+        created_at <- DBI::dbGetQuery(con, "SELECT created_at FROM tweets limit 1")
+        if ("POSIXct" %in% class(created_at$created_at)) {
+            convert_date <- TRUE
+        } else {
+            convert_date <- FALSE
+        }
+    } else {
+        db_exists <- FALSE
+    }
     if (convert_date) {
         empty_str$created_at <- as.POSIXct(empty_str$created_at)
         empty_str$user_created_at <- as.POSIXct(empty_str$created_at)        
     }
-    con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
-    ## con@driver@read_only
-    ## "duckdb_connection" %in% class(con)
     if (convert_date) {
         sqlfile <- "schema_timestamp.sql"
     } else {
         sqlfile <- "schema.sql"
     }
-    rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", sqlfile, package = "academicquacker")))
+    if (!db_exists) {
+        rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", sqlfile, package = "academicquacker")))
+    }
     .insert(files = files, con = con, empty_str = empty_str, convert_date = convert_date, verbose = verbose)
     if (db_close) {
         DBI::dbDisconnect(con, shutdown = TRUE)
