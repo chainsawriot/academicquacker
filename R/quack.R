@@ -26,9 +26,10 @@
 #' @param db path to the DuckDB; the default value ":memory:" converts the data into a DuckDB in main memory
 #' @param db_close whether to close the DuckDB after the operation. It is better to set it to TRUE, if `db` is not ":memory:"
 #' @param return_con whether or not to return the connnection object; if false, the argument db is returned invisibly.
+#' @param convert_date whether or not `created_at` and `user_created_at` should be converted to date
 #' @param verbose whether to display a progress bar
 #' @export
-quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRUE, verbose = TRUE) {
+quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = FALSE, return_con = TRUE, verbose = TRUE) {
     files <- .ls_files(data_path, "^data_.+\\.json")
     empty_str <- structure(list(tweet_id = character(0), user_username = character(0),
                                 text = character(0), possibly_sensitive = logical(0), lang = character(0),
@@ -45,12 +46,20 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRU
                                 sourcetweet_text = character(0), sourcetweet_lang = character(0), 
                                 sourcetweet_author_id = character(0)), row.names = integer(0), class = c("tbl_df", 
                                                                                                          "tbl", "data.frame"))
-
+    if (convert_date) {
+        empty_str$created_at <- as.POSIXct(empty_str$created_at)
+        empty_str$user_created_at <- as.POSIXct(empty_str$created_at)        
+    }
     con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db , read_only = FALSE)
     ## con@driver@read_only
     ## "duckdb_connection" %in% class(con)
-    rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", "schema.sql", package = "academicquacker")))
-    .insert(files = files, con = con, empty_str = empty_str, verbose = verbose)
+    if (convert_date) {
+        sqlfile <- "schema_timestamp.sql"
+    } else {
+        sqlfile <- "schema.sql"
+    }
+    rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", sqlfile, package = "academicquacker")))
+    .insert(files = files, con = con, empty_str = empty_str, convert_date = convert_date, verbose = verbose)
     if (db_close) {
         DBI::dbDisconnect(con, shutdown = TRUE)
         invisible(db)
@@ -61,16 +70,25 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRU
     invisible(db)
 }
 
-.insert <- function(files, con, empty_str, verbose = TRUE) {
+.convert <- function(file, convert_date = FALSE) {
+    res <- academictwitteR::convert_json(file)
+    if (convert_date) {
+        res$created_at <- as.POSIXct(res$created_at)
+        res$user_created_at <- as.POSIXct(res$user_created_at)
+    }
+    return(res)
+}
+
+.insert <- function(files, con, empty_str, convert_date = FALSE, verbose = TRUE) {
     if (verbose) {
         cli::cli_progress_bar("Converting data", total = length(files))
             for (file in files) {
-                DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, academictwitteR::convert_json(file)), append = TRUE)
+                DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, .convert(file, convert_date = convert_date)), append = TRUE)
                 cli::cli_progress_update()
             }
         cli::cli_progress_done()
     } else {
-        purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, academictwitteR::convert_json(.)), append = TRUE))
+        purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, .convert(., convert_date = convert_date)), append = TRUE))
     }
     invisible(files)
 }
