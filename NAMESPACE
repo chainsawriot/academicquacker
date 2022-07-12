@@ -3,4 +3,3 @@
 export("%>%")
 export(quack)
 importFrom(magrittr,"%>%")
-importFrom(rlang,.data)

@@ -8,6 +8,7 @@ quack(
   data_path,
   db = ":memory:",
   db_close = FALSE,
+  convert_date = FALSE,
   return_con = TRUE,
   verbose = TRUE
 )
@@ -18,6 +19,8 @@ quack(
 \item{db}{path to the DuckDB; the default value ":memory:" converts the data into a DuckDB in main memory}
 
 \item{db_close}{whether to close the DuckDB after the operation. It is better to set it to TRUE, if \code{db} is not ":memory:"}
+
+\item{convert_date}{whether or not \code{created_at} and \code{user_created_at} should be converted to date}
 
 \item{return_con}{whether or not to return the connnection object; if false, the argument db is returned invisibly.}
 
