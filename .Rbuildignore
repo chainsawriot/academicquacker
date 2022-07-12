@@ -2,7 +2,5 @@
 ^README\.Rmd$
 ^README\.html$
 ^tests/testdata
-^tests/testthat/test-basic\.R$
-^tests/testthat/test-issue5\.R$
 ^\.github$
 ^raw/*\.R$

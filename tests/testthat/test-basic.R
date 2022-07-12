@@ -1,5 +1,5 @@
 test_that("most basic op.", {
-    skip_on_cran()
+    skip_if(!dir.exists("../testdata"))
     dir <- "../testdata/ica21"
     expect_error(quack(dir, db = "mydata.duckdb", db_close = TRUE), NA)
     ## clean
@@ -9,7 +9,7 @@ test_that("most basic op.", {
 ## flags
 
 test_that("verbose", {
-    skip_on_cran()
+    skip_if(!dir.exists("../testdata"))
     dir <- "../testdata/ica21"
     ## expect_output(quack(dir, db = "mydata.duckdb", db_close = TRUE, verbose = TRUE))
     ## unlink("mydata.duckdb")
