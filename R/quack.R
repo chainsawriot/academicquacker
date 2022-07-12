@@ -65,12 +65,12 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, return_con = TRU
     if (verbose) {
         cli::cli_progress_bar("Converting data", total = length(files))
             for (file in files) {
-                DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, convert_json(file)), append = TRUE)
+                DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, academictwitteR::convert_json(file)), append = TRUE)
                 cli::cli_progress_update()
             }
         cli::cli_progress_done()
     } else {
-        purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, convert_json(.)), append = TRUE))
+        purrr::walk(files, ~DBI::dbWriteTable(con, "tweets", dplyr::bind_rows(empty_str, academictwitteR::convert_json(.)), append = TRUE))
     }
     invisible(files)
 }
