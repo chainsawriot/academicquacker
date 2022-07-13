@@ -19,11 +19,6 @@ Imports:
     DBI,
     purrr,
     dplyr,
-    tidyr,
-    rlang,
-    jsonlite,
-    tibble,
-    tidyselect,
     magrittr,
     cli
 Suggests: 

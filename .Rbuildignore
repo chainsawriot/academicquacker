@@ -3,4 +3,4 @@
 ^README\.html$
 ^tests/testdata
 ^\.github$
-^raw/*\.R$
+^raw$
