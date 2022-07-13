@@ -19,6 +19,12 @@
 ## library(DBI)
 ## library(duckdb)
 
+.exe_sqlfile <- function(sqlfile, con) {
+    sql_statement <- paste(readLines(system.file("extdata", sqlfile, package = "academicquacker")), collapse = "")
+    rubbish <- DBI::dbExecute(con, sql_statement)
+    invisible(sqlfile)
+}
+
 #' Convert data collected with academictwitteR into DuckDB
 #'
 #' This function coverts data collected with academictwitteR into DuckDB.
@@ -68,7 +74,8 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = F
         sqlfile <- "schema.sql"
     }
     if (!db_exists) {
-        rubbish <- DBI::dbExecute(con, readLines(system.file("extdata", sqlfile, package = "academicquacker")))
+        .exe_sqlfile("seq.sql", con)
+        .exe_sqlfile(sqlfile, con)
     }
     .insert(files = files, con = con, empty_str = empty_str, convert_date = convert_date, verbose = verbose)
     if (db_close) {
