@@ -66,7 +66,7 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = F
     }
     if (convert_date) {
         empty_str$created_at <- as.POSIXct(empty_str$created_at)
-        empty_str$user_created_at <- as.POSIXct(empty_str$created_at)        
+        empty_str$user_created_at <- as.POSIXct(empty_str$user_created_at)        
     }
     if (convert_date) {
         sqlfile <- "schema_timestamp.sql"
@@ -91,8 +91,8 @@ quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = F
 .convert <- function(file, convert_date = FALSE) {
     res <- academictwitteR::convert_json(file)
     if (convert_date) {
-        res$created_at <- as.POSIXct(res$created_at)
-        res$user_created_at <- as.POSIXct(res$user_created_at)
+        res$created_at <- lubridate::ymd_hms(res$created_at)
+        res$user_created_at <- lubridate::ymd_hms(res$user_created_at)
     }
     return(res)
 }

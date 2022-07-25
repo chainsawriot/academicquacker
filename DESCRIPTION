@@ -1,6 +1,6 @@
 Package: academicquacker
 Title: Convert Twitter Data To DuckDB And Other Formats
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     person(given = "Chung-hong",
            family = "Chan",
@@ -20,7 +20,8 @@ Imports:
     purrr,
     dplyr,
     magrittr,
-    cli
+    cli,
+    lubridate
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
