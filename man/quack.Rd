@@ -10,7 +10,8 @@ quack(
   db_close = FALSE,
   convert_date = FALSE,
   return_con = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  error = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ quack(
 \item{return_con}{whether or not to return the connnection object; if false, the argument db is returned invisibly.}
 
 \item{verbose}{whether to display a progress bar}
+
+\item{error}{whether to raise error if there is no data}
 }
 \description{
 This function coverts data collected with academictwitteR into DuckDB.

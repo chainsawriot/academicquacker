@@ -1,14 +1,17 @@
 ## require(academictwitteR)
 ## x <- bind_tweets("~/dev/einfach/tests/testdata/ica21", output_format = "tidy")
 
-.ls_files <- function(data_path, pattern) {
+.ls_files <- function(data_path, pattern, error = TRUE) {
     files <- list.files(path = file.path(data_path), pattern = pattern, recursive = TRUE, include.dirs = TRUE, full.names = TRUE)
     if (length(files) < 1) {
-        stop(paste0("There are no files matching the pattern `", pattern, "` in the specified directory."), call. = FALSE)
+        if (error) {
+            stop(paste0("There are no files matching the pattern `", pattern, "` in the specified directory."), call. = FALSE)
+        } else {
+            return(NULL)
+        }
     }
     return(files)
 }
-
 
 ## sanity check
 ## all(.gen_aux_filename(data_files) %in% .ls_files(data_path, "^users_"))
@@ -34,9 +37,13 @@
 #' @param return_con whether or not to return the connnection object; if false, the argument db is returned invisibly.
 #' @param convert_date whether or not `created_at` and `user_created_at` should be converted to date
 #' @param verbose whether to display a progress bar
+#' @param error whether to raise error if there is no data
 #' @export
-quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = FALSE, return_con = TRUE, verbose = TRUE) {
-    files <- .ls_files(data_path, "^data_.+\\.json")
+quack <- function(data_path, db = ":memory:", db_close = FALSE, convert_date = FALSE, return_con = TRUE, verbose = TRUE, error = FALSE) {
+    files <- .ls_files(data_path, "^data_.+\\.json", error = error)
+    if (is.null(files)) {
+        return(invisible(db))
+    }
     empty_str <- structure(list(tweet_id = character(0), user_username = character(0),
                                 text = character(0), possibly_sensitive = logical(0), lang = character(0),
                                 conversation_id = character(0), source = character(0), author_id = character(0),
